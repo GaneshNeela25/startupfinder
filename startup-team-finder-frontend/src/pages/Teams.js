@@ -30,6 +30,7 @@ function Teams() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    team.ownerId = currentUser.id;
 
     axios.post("http://localhost:8080/teams", team)
       .then(() => {
@@ -38,12 +39,30 @@ function Teams() {
 
         setTeam({
           teamName: "",
-          description: ""
+          description: "",
+          requiredSkills: ""
         });
 
         fetchTeams();
       });
   };
+
+  const currentUser =
+  JSON.parse(localStorage.getItem("user"));
+
+  if (currentUser.role !== "FOUNDER") {
+
+  return (
+
+    <div className="container">
+
+      <h2>
+        Only founders can create teams.
+      </h2>
+
+    </div>
+  );
+}
 
   return (
 
@@ -69,6 +88,14 @@ function Teams() {
           onChange={handleChange}
         />
 
+        <input
+          type="text"
+          name="requiredSkills"
+          placeholder="Required Skills"
+          value={team.requiredSkills}
+          onChange={handleChange}
+        />
+
         <button type="submit">Create Team</button>
 
       </form>
@@ -83,6 +110,11 @@ function Teams() {
             <h3>{t.teamName}</h3>
 
             <p>{t.description}</p>
+
+            <p>
+              <strong>Required:</strong>
+              {t.requiredSkills}
+            </p>
 
           </div>
         ))}

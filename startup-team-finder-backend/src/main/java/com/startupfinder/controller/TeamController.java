@@ -25,4 +25,13 @@ public class TeamController {
     public List<Team> getTeams() {
         return teamRepository.findAll();
     }
+
+    @GetMapping("/owner/{ownerId}")
+
+    public List<Team> getTeamsByOwner(
+        @PathVariable Long ownerId
+) {
+
+    return teamRepository.findByOwnerId(ownerId);
+}
 }

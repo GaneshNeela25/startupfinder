@@ -80,7 +80,13 @@ function Login() {
           onChange={handleChange}
         />
 
-        <button type="submit">
+        <button
+          type="submit"
+          disabled={
+          !user.email ||
+          !user.password
+          }
+        >
           Login
         </button>
 

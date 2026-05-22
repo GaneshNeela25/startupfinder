@@ -75,21 +75,48 @@ function Register() {
 
         <input
           type="text"
-          name="role"
-          placeholder="Role (Developer/Designer)"
-          value={user.role}
-          onChange={handleChange}
-        />
-
-        <input
-          type="text"
           name="skills"
           placeholder="Skills"
           value={user.skills}
           onChange={handleChange}
         />
 
-        <button type="submit">Register</button>
+        <select
+          name="role"
+          value={user.role}
+          onChange={handleChange}
+        >
+
+        <option value="">
+            Select Role
+        </option>
+
+        <option value="FOUNDER">
+            Founder
+        </option>
+
+        <option value="DEVELOPER">
+          Developer
+        </option>
+
+        <option value="DESIGNER">
+          Designer
+        </option>
+
+        </select>
+
+        <button
+          type="submit"
+          disabled={
+          !user.name ||
+          !user.email ||
+          !user.password ||
+          !user.skills ||
+          !user.role
+          }
+        >
+          Register
+        </button>
       </form>
     </div>
   );

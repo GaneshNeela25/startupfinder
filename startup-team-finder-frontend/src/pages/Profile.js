@@ -1,8 +1,29 @@
 import React from "react";
+import axios from "axios";
+
+import { useEffect, useState } from "react";
 
 function Profile() {
 
   const user = JSON.parse(localStorage.getItem("user"));
+  const [requests, setRequests] =
+  useState([]);
+
+  useEffect(() => {
+
+  axios.get(
+
+    `http://localhost:8080/requests/user/${user.id}`
+
+  )
+
+  .then((response) => {
+
+    setRequests(response.data);
+
+  });
+
+}, []);
 
   return (
 
@@ -23,6 +44,34 @@ function Profile() {
         <p>{user.role}</p>
 
         <p>{user.skills}</p>
+
+        <h2>My Team Requests</h2>
+
+{requests.map((req) => (
+
+  <div
+    key={req.id}
+    className="card"
+  >
+
+    <p>
+      <strong>Status:</strong>
+      {req.status}
+    </p>
+
+    <p>
+      <strong>Role:</strong>
+      {req.role}
+    </p>
+
+    <p>
+      <strong>Message:</strong>
+      {req.message}
+    </p>
+
+  </div>
+
+))}
 
       </div>
 

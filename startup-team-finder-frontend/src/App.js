@@ -1,5 +1,8 @@
 import React from "react";
 import Matches from "./pages/Matches";
+import SuggestedTeams from "./pages/SuggestedTeams";
+import Requests from "./pages/Requests";
+import TeamChat from "./pages/TeamChat";
 import {
   BrowserRouter,
   Routes,
@@ -78,6 +81,33 @@ function App() {
             user ? <Matches /> : <Navigate to="/login" />
           }
         />
+
+        <Route
+          path="/suggested-teams"
+          element={
+            user
+            ? <SuggestedTeams />
+            : <Navigate to="/login" />
+          }
+        />
+
+        <Route
+          path="/requests"
+          element={
+          user
+          ? <Requests />
+          : <Navigate to="/login" />
+          }
+        />
+
+        <Route
+  path="/team-chat"
+  element={
+    user
+      ? <TeamChat />
+      : <Navigate to="/login" />
+  }
+/>
 
       </Routes>
 

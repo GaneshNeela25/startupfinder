@@ -75,7 +75,9 @@ function Home() {
 
             <p>{user.email}</p>
 
-            <p>{user.role}</p>
+            <p>
+              <strong>Role:</strong> {user.role}
+            </p>
 
             <p>{user.skills}</p>
 
