@@ -42,8 +42,6 @@ function Navbar() {
 
         <Link to="/profile">Profile</Link>
 
-        <Link to="/matches">Matches</Link>
-
         <Link to="/team-chat">Team Chat</Link>
 
         <Link to="/suggested-teams">Suggested Teams</Link>

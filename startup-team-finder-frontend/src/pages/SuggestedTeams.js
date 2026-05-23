@@ -1,26 +1,50 @@
-import React, { useEffect, useState } from "react";
+import React, {
+  useEffect,
+  useState
+} from "react";
 
 import axios from "axios";
 
 function SuggestedTeams() {
 
-  const [teams, setTeams] = useState([]);
-  const [message, setMessage] = useState("");
+  const [teams, setTeams] =
+    useState([]);
+
+  const [requests, setRequests] =
+    useState([]);
 
   const currentUser =
     JSON.parse(localStorage.getItem("user"));
 
   useEffect(() => {
 
-    axios.get("http://localhost:8080/teams")
+    axios.get(
+      "http://localhost:8080/teams"
+    )
 
-      .then((response) => {
+    .then((teamResponse) => {
 
-        const allTeams = response.data;
+      axios.get(
 
-        const matchedTeams =
-          allTeams.filter((team) => {
+        `http://localhost:8080/requests/user/${currentUser.id}`
 
+      )
+
+      .then((requestResponse) => {
+
+        setRequests(requestResponse.data);
+
+        const filteredTeams =
+          teamResponse.data.filter((team) => {
+
+            // founder should not see own teams
+            if (
+              team.ownerId === currentUser.id
+            ) {
+              return false;
+            }
+
+            // skill matching
             return currentUser.skills
               .toLowerCase()
               .split(",")
@@ -31,42 +55,59 @@ function SuggestedTeams() {
                   .toLowerCase()
                   .includes(skill.trim())
               );
+
           });
 
-        setTeams(matchedTeams);
+        setTeams(filteredTeams);
 
       });
+
+    });
 
   }, []);
 
   const sendRequest = (teamId) => {
 
-  axios.post(
-    "http://localhost:8080/requests",
+    axios.post(
 
-    {
+      "http://localhost:8080/requests",
 
-      userId: currentUser.id,
+      {
 
-      teamId: teamId,
+        userId: currentUser.id,
 
-      userName: currentUser.name,
+        teamId: teamId,
 
-      role: currentUser.role,
+        userName: currentUser.name,
 
-      message: message
+        role: currentUser.role,
 
-    }
+        message:
+          "I want to join this team"
 
-  )
+      }
 
-  .then(() => {
+    )
 
-    alert("Request Sent!");
+    .then(() => {
 
-    setMessage("");
-  });
-};
+      alert("Request Sent");
+
+      window.location.reload();
+
+    });
+
+  };
+
+  const getStatus = (teamId) => {
+
+    const req = requests.find(
+
+      (r) => r.teamId === teamId
+    );
+
+    return req ? req.status : null;
+  };
 
   return (
 
@@ -78,35 +119,42 @@ function SuggestedTeams() {
 
         {teams.map((team) => (
 
-          <div className="card" key={team.id}>
+          <div
+            className="card"
+            key={team.id}
+          >
 
-            <h3>{team.teamName}</h3>
+            <h2>{team.teamName}</h2>
 
             <p>{team.description}</p>
 
             <p>
-              <strong>Required:</strong>
+              <strong>
+                Required Skills:
+              </strong>
+
               {team.requiredSkills}
             </p>
 
-            <div>
+            {getStatus(team.id) ? (
 
-  <input
-    type="text"
-    placeholder="Message to founder"
-    value={message}
-    onChange={(e) =>
-      setMessage(e.target.value)
-    }
-  />
+              <p>
+                <strong>Status:</strong>
 
-    <button
-        onClick={() => sendRequest(team.id)}
-    >
-        Request to Join
-    </button>
+                {getStatus(team.id)}
+              </p>
 
-</div>
+            ) : (
+
+              <button
+                onClick={() =>
+                  sendRequest(team.id)
+                }
+              >
+                Request to Join
+              </button>
+
+            )}
 
           </div>
 

@@ -1,43 +1,45 @@
-import React from "react";
-import axios from "axios";
+import React, {
+  useEffect,
+  useState
+} from "react";
 
-import { useEffect, useState } from "react";
+import axios from "axios";
 
 function Profile() {
 
-  const user = JSON.parse(localStorage.getItem("user"));
+  const user =
+    JSON.parse(localStorage.getItem("user"));
+
   const [requests, setRequests] =
-  useState([]);
+    useState([]);
 
   useEffect(() => {
 
-  axios.get(
+    axios.get(
 
-    `http://localhost:8080/requests/user/${user.id}`
+      `http://localhost:8080/requests/user/${user.id}`
 
-  )
+    )
 
-  .then((response) => {
+    .then((response) => {
 
-    setRequests(response.data);
+      setRequests(response.data);
 
-  });
+    });
 
-}, []);
+  }, []);
 
   return (
 
-    <div className="container">
+    <div className="profile-page">
 
-      <h1>User Profile</h1>
-
-      <div className="card">
+      <div className="profile-card">
 
         <div className="avatar">
-            {user.name.charAt(0)}
+          {user.name.charAt(0)}
         </div>
 
-        <h2>{user.name}</h2>
+        <h1>{user.name}</h1>
 
         <p>{user.email}</p>
 
@@ -45,33 +47,41 @@ function Profile() {
 
         <p>{user.skills}</p>
 
+      </div>
+
+      <div className="request-section">
+
         <h2>My Team Requests</h2>
 
-{requests.map((req) => (
+        <div className="request-grid">
 
-  <div
-    key={req.id}
-    className="card"
-  >
+          {requests.map((req) => (
 
-    <p>
-      <strong>Status:</strong>
-      {req.status}
-    </p>
+            <div
+              key={req.id}
+              className="request-card"
+            >
 
-    <p>
-      <strong>Role:</strong>
-      {req.role}
-    </p>
+              <p>
+                <strong>Status:</strong>
+                {req.status}
+              </p>
 
-    <p>
-      <strong>Message:</strong>
-      {req.message}
-    </p>
+              <p>
+                <strong>Role:</strong>
+                {req.role}
+              </p>
 
-  </div>
+              <p>
+                <strong>Message:</strong>
+                {req.message}
+              </p>
 
-))}
+            </div>
+
+          ))}
+
+        </div>
 
       </div>
 

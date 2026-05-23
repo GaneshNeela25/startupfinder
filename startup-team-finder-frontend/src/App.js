@@ -1,5 +1,4 @@
 import React from "react";
-import Matches from "./pages/Matches";
 import SuggestedTeams from "./pages/SuggestedTeams";
 import Requests from "./pages/Requests";
 import TeamChat from "./pages/TeamChat";
@@ -72,13 +71,6 @@ function App() {
           path="/profile"
           element={
             user ? <Profile /> : <Navigate to="/login" />
-          }
-        />
-
-        <Route
-          path="/matches"
-          element={
-            user ? <Matches /> : <Navigate to="/login" />
           }
         />
 
