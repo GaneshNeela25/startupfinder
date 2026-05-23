@@ -11,4 +11,5 @@ public interface JoinRequestRepository
 
     List<JoinRequest> findByTeamId(Long teamId);
     List<JoinRequest> findByUserId(Long userId);
+    List<JoinRequest> findByTeamIdIn(List<Long> teamIds);
 }

@@ -1,33 +1,10 @@
-import React, {
-  useEffect,
-  useState
-} from "react";
-
-import axios from "axios";
+import React from "react";
+import "./Profile.css";
 
 function Profile() {
 
   const user =
     JSON.parse(localStorage.getItem("user"));
-
-  const [requests, setRequests] =
-    useState([]);
-
-  useEffect(() => {
-
-    axios.get(
-
-      `http://localhost:8080/requests/user/${user.id}`
-
-    )
-
-    .then((response) => {
-
-      setRequests(response.data);
-
-    });
-
-  }, []);
 
   return (
 
@@ -35,58 +12,42 @@ function Profile() {
 
       <div className="profile-card">
 
-        <div className="avatar">
+        <div className="profile-avatar">
+
           {user.name.charAt(0)}
+
         </div>
 
         <h1>{user.name}</h1>
 
         <p>{user.email}</p>
 
-        <p>{user.role}</p>
+        <div className="profile-details">
 
-        <p>{user.skills}</p>
+          <div className="detail-box">
 
-      </div>
+            <h3>Role</h3>
 
-      <div className="request-section">
+            <p>{user.role}</p>
 
-        <h2>My Team Requests</h2>
+          </div>
 
-        <div className="request-grid">
+          <div className="detail-box">
 
-          {requests.map((req) => (
+            <h3>Skills</h3>
 
-            <div
-              key={req.id}
-              className="request-card"
-            >
+            <p>{user.skills}</p>
 
-              <p>
-                <strong>Status:</strong>
-                {req.status}
-              </p>
-
-              <p>
-                <strong>Role:</strong>
-                {req.role}
-              </p>
-
-              <p>
-                <strong>Message:</strong>
-                {req.message}
-              </p>
-
-            </div>
-
-          ))}
+          </div>
 
         </div>
 
       </div>
 
     </div>
+
   );
+
 }
 
 export default Profile;

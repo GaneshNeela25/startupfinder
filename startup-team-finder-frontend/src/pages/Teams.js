@@ -1,128 +1,237 @@
-import React, { useEffect, useState } from "react";
+import React, {
+  useEffect,
+  useState
+} from "react";
+
 import axios from "axios";
+
+import { useNavigate } from "react-router-dom";
+
+import "./Team.css";
 
 function Teams() {
 
-  const [teams, setTeams] = useState([]);
-
-  const [team, setTeam] = useState({
-    teamName: "",
-    description: ""
-  });
-
-  useEffect(() => {
-    fetchTeams();
-  }, []);
-
-  const fetchTeams = () => {
-    axios.get("http://localhost:8080/teams")
-      .then((response) => {
-        setTeams(response.data);
-      });
-  };
-
-  const handleChange = (e) => {
-    setTeam({
-      ...team,
-      [e.target.name]: e.target.value
-    });
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    team.ownerId = currentUser.id;
-
-    axios.post("http://localhost:8080/teams", team)
-      .then(() => {
-
-        alert("Team Created!");
-
-        setTeam({
-          teamName: "",
-          description: "",
-          requiredSkills: ""
-        });
-
-        fetchTeams();
-      });
-  };
+  const navigate =
+    useNavigate();
 
   const currentUser =
-  JSON.parse(localStorage.getItem("user"));
+    JSON.parse(localStorage.getItem("user"));
 
-  if (currentUser.role !== "FOUNDER") {
+  const [teams, setTeams] =
+    useState([]);
+
+  useEffect(() => {
+
+  const loadTeams = async () => {
+
+    try {
+
+      // ALL TEAMS
+      const teamResponse =
+        await axios.get(
+          "http://localhost:8080/teams"
+        );
+
+      const allTeams =
+        teamResponse.data;
+
+      // USER ROLE
+      const role =
+        currentUser.role
+          .toLowerCase()
+          .trim();
+
+      // ===== FOUNDER =====
+      if (role.includes("founder")) {
+
+        const founderTeams =
+
+          allTeams.filter(
+
+            (team) =>
+
+              Number(team.ownerId) ===
+              Number(currentUser.id)
+
+          );
+
+        setTeams(founderTeams);
+
+      }
+
+      // ===== NON FOUNDER =====
+      else {
+
+        const requestResponse =
+          await axios.get(
+
+            `http://localhost:8080/requests/user/${currentUser.id}`
+
+          );
+
+        // ONLY APPROVED
+        const approvedRequests =
+
+          requestResponse.data.filter(
+
+            (req) =>
+
+              req.status ===
+              "APPROVED"
+
+          );
+
+        // TEAM IDS
+        const approvedTeamIds =
+
+          approvedRequests.map(
+
+            (req) =>
+              Number(req.teamId)
+
+          );
+
+        // FILTER TEAMS
+        const joinedTeams =
+
+          allTeams.filter(
+
+            (team) =>
+
+              approvedTeamIds.includes(
+                Number(team.id)
+              )
+
+          );
+
+        setTeams(joinedTeams);
+
+      }
+
+    } catch (error) {
+
+      console.log(error);
+
+    }
+
+  };
+
+  loadTeams();
+
+}, []);
+
+  const openChat = (team) => {
+
+  const isApproved = teams.some(
+    (t) => t.id === team.id
+  );
+
+  if (!isApproved) {
+
+    alert(
+      "You are not approved for this team"
+    );
+
+    return;
+  }
+
+  localStorage.setItem(
+    "selectedTeam",
+    JSON.stringify(team)
+  );
+
+  navigate("/team-chat");
+
+};
 
   return (
 
-    <div className="container">
+    <div className="team-page">
 
-      <h2>
-        Only founders can create teams.
-      </h2>
+      {
+  currentUser.role
+    .toLowerCase()
+    .includes("founder")
 
-    </div>
-  );
+  &&
+
+  <div className="create-team-box">
+
+    <button
+      className="create-team-btn"
+      onClick={() =>
+        navigate("/create-team")
+      }
+    >
+      + Create New Team
+    </button>
+
+  </div>
 }
 
-  return (
+      <h1>Your Teams</h1>
 
-    <div className="container">
+      <div className="team-grid">
 
-      <h1>Create Startup Team</h1>
+        {teams.length === 0 ? (
 
-      <form className="form" onSubmit={handleSubmit}>
+          <div className="empty-box">
 
-        <input
-          type="text"
-          name="teamName"
-          placeholder="Team Name"
-          value={team.teamName}
-          onChange={handleChange}
-        />
-
-        <input
-          type="text"
-          name="description"
-          placeholder="Description"
-          value={team.description}
-          onChange={handleChange}
-        />
-
-        <input
-          type="text"
-          name="requiredSkills"
-          placeholder="Required Skills"
-          value={team.requiredSkills}
-          onChange={handleChange}
-        />
-
-        <button type="submit">Create Team</button>
-
-      </form>
-
-      <h1>All Teams</h1>
-
-      <div className="card-container">
-
-        {teams.map((t) => (
-          <div className="card" key={t.id}>
-
-            <h3>{t.teamName}</h3>
-
-            <p>{t.description}</p>
-
-            <p>
-              <strong>Required:</strong>
-              {t.requiredSkills}
-            </p>
+            No Teams Available
 
           </div>
-        ))}
+
+        ) : (
+
+          teams.map((team) => (
+
+            <div
+              className="team-card"
+              key={team.id}
+            >
+
+              <div className="team-icon">
+
+                {team.teamName
+                  ?.charAt(0)}
+
+              </div>
+
+              <h2>
+                {team.teamName}
+              </h2>
+
+              <p>
+                {team.description}
+              </p>
+
+              <div className="skills-box">
+
+                {team.requiredSkills}
+
+              </div>
+
+              <button
+                className="chat-btn"
+                onClick={() =>
+                  openChat(team)
+                }
+              >
+                Open Chat
+              </button>
+
+            </div>
+
+          ))
+
+        )}
 
       </div>
 
     </div>
+
   );
+
 }
 
 export default Teams;

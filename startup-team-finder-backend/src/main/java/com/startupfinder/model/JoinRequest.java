@@ -21,6 +21,8 @@ public class JoinRequest {
 
     private String status;
 
+    private String resumeFileName;
+
     public JoinRequest() {
     }
 
@@ -74,5 +76,16 @@ public class JoinRequest {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getResumeFileName() {
+    return resumeFileName;
+    }
+
+    public void setResumeFileName(
+        String resumeFileName
+    ) {
+        this.resumeFileName =
+            resumeFileName;
     }
 }

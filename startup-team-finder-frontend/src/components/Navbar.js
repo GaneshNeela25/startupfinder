@@ -46,13 +46,11 @@ function Navbar() {
 
         <Link to="/suggested-teams">Suggested Teams</Link>
 
+        <Link to="/teams">Teams</Link>
+
         {user?.role?.includes("FOUNDER") && (
 
   <>
-    <Link to="/teams">
-      Teams
-    </Link>
-
     <Link to="/requests">
       Requests
     </Link>

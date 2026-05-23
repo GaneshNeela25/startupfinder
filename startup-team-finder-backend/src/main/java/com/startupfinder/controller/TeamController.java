@@ -10,28 +10,28 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/teams")
-@CrossOrigin("*")
+@CrossOrigin(origins = "*")
 public class TeamController {
 
     @Autowired
-    TeamRepository teamRepository;
+    private TeamRepository teamRepository;
 
-    @PostMapping
-    public Team createTeam(@RequestBody Team team) {
-        return teamRepository.save(team);
-    }
-
+    // GET ALL TEAMS
     @GetMapping
-    public List<Team> getTeams() {
+    public List<Team> getAllTeams() {
+
         return teamRepository.findAll();
+
     }
 
-    @GetMapping("/owner/{ownerId}")
+    // CREATE TEAM
+    @PostMapping("/create")
+    public Team createTeam(
+            @RequestBody Team team
+    ) {
 
-    public List<Team> getTeamsByOwner(
-        @PathVariable Long ownerId
-) {
+        return teamRepository.save(team);
 
-    return teamRepository.findByOwnerId(ownerId);
-}
+    }
+
 }

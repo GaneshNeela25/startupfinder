@@ -1,129 +1,217 @@
-import React, {
-  useEffect,
-  useState
-} from "react";
-
+import React, { useEffect, useState } from "react";
 import axios from "axios";
+import "./Requests.css";
 
 function Requests() {
-
-  const [requests, setRequests] =
-    useState([]);
 
   const currentUser =
     JSON.parse(localStorage.getItem("user"));
 
-useEffect(() => {
+  const [requests, setRequests] =
+    useState([]);
 
-  axios.get(
+  useEffect(() => {
 
-    `http://localhost:8080/teams/owner/${currentUser.id}`
+    axios.get(
 
-  )
+      `http://localhost:8080/requests/founder/${currentUser.id}`
 
-  .then((teamResponse) => {
+    )
 
-    const founderTeams = teamResponse.data;
+    .then((response) => {
 
-    if (founderTeams.length > 0) {
+      setRequests(response.data);
 
-      const teamId = founderTeams[0].id;
+    })
 
-      axios.get(
+    .catch((error) => {
 
-        `http://localhost:8080/requests/${teamId}`
+      console.log(error);
 
-      )
+    });
 
-      .then((requestResponse) => {
+  }, []);
 
-        setRequests(requestResponse.data);
+  const updateStatus = (
 
-      });
+    requestId,
+    status
 
-    }
-
-  });
-
-}, []);
-
-  const updateStatus = (id, status) => {
+  ) => {
 
     axios.put(
-      `http://localhost:8080/requests/${id}?status=${status}`
+
+      `http://localhost:8080/requests/${requestId}`,
+
+      {
+        status: status
+      }
+
     )
 
     .then(() => {
 
       setRequests(
 
-        requests.map((req) =>
+        requests.map((req) => {
 
-          req.id === id
-            ? { ...req, status }
-            : req
-        )
+          if (req.id === requestId) {
+
+            return {
+              ...req,
+              status: status
+            };
+
+          }
+
+          return req;
+
+        })
+
       );
+
     });
+
   };
 
   return (
 
-    <div className="container">
+    <div className="requests-page">
 
-      <h1>Join Requests</h1>
+      <div className="requests-header">
 
-      <div className="card-container">
+        <h1>Team Join Requests</h1>
 
-        {requests.map((req) => (
+        <p>
+          Review applications from
+          developers, designers,
+          and investors
+        </p>
 
-          <div className="card" key={req.id}>
+      </div>
 
-            <h3>{req.userName}</h3>
+      <div className="requests-grid">
 
-            <p>{req.role}</p>
+        {requests.length === 0 ? (
 
-            <p>{req.message}</p>
+          <div className="empty-box">
 
-            <p>
-              Status:
-              <strong>
-                {req.status}
-              </strong>
-            </p>
-
-            {req.status === "PENDING" && (
-
-              <div>
-
-                <button
-                  onClick={() =>
-                    updateStatus(
-                      req.id,
-                      "APPROVED"
-                    )
-                  }
-                >
-                  Accept
-                </button>
-
-                <button
-                  onClick={() =>
-                    updateStatus(
-                      req.id,
-                      "REJECTED"
-                    )
-                  }
-                >
-                  Reject
-                </button>
-
-              </div>
-            )}
+            No requests found
 
           </div>
 
-        ))}
+        ) : (
+
+          requests.map((req) => (
+
+            <div
+              className="request-card"
+              key={req.id}
+            >
+
+              <div className="profile-circle">
+
+                {req.userName
+                  ?.charAt(0)
+                  .toUpperCase()}
+
+              </div>
+
+              <h2>{req.userName}</h2>
+
+              <div className="info-row">
+
+                <span className="label">
+                  Role
+                </span>
+
+                <span className="value">
+                  {req.role}
+                </span>
+
+              </div>
+
+              <div className="info-row">
+
+                <span className="label">
+                  Status
+                </span>
+
+                <span
+                  className={
+                    req.status === "APPROVED"
+                      ? "status approved"
+                      : req.status === "REJECTED"
+                      ? "status rejected"
+                      : "status pending"
+                  }
+                >
+                  {req.status}
+                </span>
+
+              </div>
+
+              <div className="message-box">
+
+                <strong>Message</strong>
+
+                <p>
+                  {req.message ||
+                    "No message provided"}
+                </p>
+
+              </div>
+
+              {req.resumeFileName && (
+
+                <a
+                  className="resume-btn"
+                  href={`http://localhost:8080/uploads/${req.resumeFileName}`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  View Resume
+                </a>
+
+              )}
+
+              {req.status === "PENDING" && (
+
+  <div className="action-buttons">
+
+    <button
+      className="approve-btn"
+      onClick={() =>
+        updateStatus(
+          req.id,
+          "APPROVED"
+        )
+      }
+    >
+      Approve
+    </button>
+
+    <button
+      className="reject-btn"
+      onClick={() =>
+        updateStatus(
+          req.id,
+          "REJECTED"
+        )
+      }
+    >
+      Reject
+    </button>
+
+  </div>
+
+)}
+
+            </div>
+
+          ))
+
+        )}
 
       </div>
 

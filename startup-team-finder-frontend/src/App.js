@@ -2,6 +2,7 @@ import React from "react";
 import SuggestedTeams from "./pages/SuggestedTeams";
 import Requests from "./pages/Requests";
 import TeamChat from "./pages/TeamChat";
+import CreateTeam from "./pages/CreateTeam";
 import {
   BrowserRouter,
   Routes,
@@ -99,6 +100,11 @@ function App() {
       ? <TeamChat />
       : <Navigate to="/login" />
   }
+/>
+
+<Route
+  path="/create-team"
+  element={<CreateTeam />}
 />
 
       </Routes>

@@ -1,0 +1,127 @@
+.suggested-page {
+  min-height: 100vh;
+  background: #081b4b;
+  padding: 40px;
+  color: white;
+}
+
+.suggested-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.suggested-header h1 {
+  font-size: 42px;
+  margin-bottom: 10px;
+}
+
+.suggested-header p {
+  color: #d1d5db;
+}
+
+.teams-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 25px;
+  justify-content: center;
+}
+
+.team-card {
+  width: 360px;
+  background: white;
+  color: #081b4b;
+  border-radius: 18px;
+  padding: 25px;
+  box-shadow: 0px 8px 25px rgba(0,0,0,0.2);
+}
+
+.team-top {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.team-logo {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background: #081b4b;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.creator {
+  color: gray;
+}
+
+.team-section {
+  margin-bottom: 20px;
+}
+
+.team-section p {
+  margin-top: 8px;
+}
+
+.team-card textarea {
+  width: 100%;
+  height: 90px;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  margin-bottom: 15px;
+  resize: none;
+}
+
+.team-card input {
+  margin-bottom: 15px;
+}
+
+.team-card button {
+  width: 100%;
+  background: #081b4b;
+  color: white;
+  border: none;
+  padding: 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.team-card button:hover {
+  background: #0a2570;
+}
+
+.empty-box {
+  background: white;
+  color: #081b4b;
+  padding: 30px;
+  border-radius: 15px;
+  font-size: 20px;
+}
+
+.request-status {
+  margin-top: 20px;
+  padding: 12px;
+  border-radius: 10px;
+  text-align: center;
+  font-weight: bold;
+  color: white;
+}
+
+.request-status.pending {
+  background: rgba(255, 166, 0, 0.486);
+}
+
+.request-status.approved {
+  background: rgba(0, 128, 0, 0.37);
+}
+
+.request-status.rejected {
+  background: rgba(220, 20, 60, 0.432);
+}

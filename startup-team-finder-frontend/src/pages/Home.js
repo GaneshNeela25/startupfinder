@@ -1,94 +1,83 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import React from "react";
+import "./Home.css";
 
 function Home() {
 
-  const [users, setUsers] = useState([]);
-
-  const [search, setSearch] = useState("");
-
-  useEffect(() => {
-    fetchUsers();
-  }, []);
-
-  const fetchUsers = () => {
-
-    axios.get("http://localhost:8080/users")
-      .then((response) => {
-        setUsers(response.data);
-      });
-
-  };
-
-  const searchUsers = () => {
-
-    if (search.trim() === "") {
-
-      fetchUsers();
-
-    } else {
-
-      axios.get(
-        `http://localhost:8080/users/search?skill=${search}`
-      )
-
-      .then((response) => {
-        setUsers(response.data);
-      });
-
-    }
-
-  };
+  const user =
+    JSON.parse(localStorage.getItem("user"));
 
   return (
 
-    <div className="container">
+    <div className="home-page">
 
-      <h1>Startup Members</h1>
+      <div className="hero-section">
 
-      <div className="search-box">
+        <div className="hero-left">
 
-        <input
-          type="text"
-          placeholder="Search by skill"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
+          <h1>
+            Welcome to
+            <span> BuildNest</span>
+          </h1>
 
-        <button onClick={searchUsers}>
-          Search
-        </button>
+          <p>
+            Connect with founders,
+            developers, designers,
+            and investors to build
+            amazing startups together.
+          </p>
 
-      </div>
+          <div className="hero-cards">
 
-      <div className="card-container">
+            <div className="hero-card">
+              <h3>Teams</h3>
+              <p>
+                Create and manage
+                startup teams
+              </p>
+            </div>
 
-        {users.map((user) => (
+            <div className="hero-card">
+              <h3>Networking</h3>
+              <p>
+                Connect with skilled
+                professionals
+              </p>
+            </div>
 
-          <div className="card" key={user.id}>
+            <div className="hero-card">
+              <h3>Collaboration</h3>
+              <p>
+                Chat and work together
+                in real-time
+              </p>
+            </div>
+
+          </div>
+
+        </div>
+
+        <div className="hero-right">
+
+          <div className="profile-box">
 
             <div className="avatar">
               {user.name.charAt(0)}
             </div>
 
-            <h3>{user.name}</h3>
+            <h2>{user.name}</h2>
 
-            <p>{user.email}</p>
-
-            <p>
-              <strong>Role:</strong> {user.role}
-            </p>
-
-            <p>{user.skills}</p>
+            <p>{user.role}</p>
 
           </div>
 
-        ))}
+        </div>
 
       </div>
 
     </div>
+
   );
+
 }
 
 export default Home;

@@ -5,7 +5,12 @@ import React, {
 
 import axios from "axios";
 
+import "./SuggestedTeams.css";
+
 function SuggestedTeams() {
+
+  const currentUser =
+    JSON.parse(localStorage.getItem("user"));
 
   const [teams, setTeams] =
     useState([]);
@@ -13,157 +18,250 @@ function SuggestedTeams() {
   const [requests, setRequests] =
     useState([]);
 
-  const currentUser =
-    JSON.parse(localStorage.getItem("user"));
+  const [messages, setMessages] =
+    useState({});
+
+  const [resumes, setResumes] =
+    useState({});
 
   useEffect(() => {
 
+    // FETCH TEAMS
     axios.get(
+
       "http://localhost:8080/teams"
+
     )
 
-    .then((teamResponse) => {
+    .then((response) => {
 
-      axios.get(
+      const filteredTeams =
+        response.data.filter(
 
-        `http://localhost:8080/requests/user/${currentUser.id}`
+          (team) =>
+            team.ownerId !==
+            currentUser.id
+        );
 
-      )
+      setTeams(filteredTeams);
 
-      .then((requestResponse) => {
+    });
 
-        setRequests(requestResponse.data);
+    // FETCH USER REQUESTS
+    axios.get(
 
-        const filteredTeams =
-          teamResponse.data.filter((team) => {
+      `http://localhost:8080/requests/user/${currentUser.id}`
 
-            // founder should not see own teams
-            if (
-              team.ownerId === currentUser.id
-            ) {
-              return false;
-            }
+    )
 
-            // skill matching
-            return currentUser.skills
-              .toLowerCase()
-              .split(",")
+    .then((response) => {
 
-              .some((skill) =>
-
-                team.requiredSkills
-                  .toLowerCase()
-                  .includes(skill.trim())
-              );
-
-          });
-
-        setTeams(filteredTeams);
-
-      });
+      setRequests(response.data);
 
     });
 
   }, []);
 
-  const sendRequest = (teamId) => {
+  const sendRequest = async (
+    teamId
+  ) => {
 
-    axios.post(
+    try {
 
-      "http://localhost:8080/requests",
+      const formData =
+        new FormData();
 
-      {
+      formData.append(
+        "message",
+        messages[teamId] || ""
+      );
 
-        userId: currentUser.id,
+      formData.append(
+        "role",
+        currentUser.role
+      );
 
-        teamId: teamId,
+      formData.append(
+        "userId",
+        currentUser.id
+      );
 
-        userName: currentUser.name,
+      formData.append(
+        "teamId",
+        teamId
+      );
 
-        role: currentUser.role,
+      formData.append(
+        "userName",
+        currentUser.name
+      );
 
-        message:
-          "I want to join this team"
+      if (resumes[teamId]) {
+
+        formData.append(
+          "resume",
+          resumes[teamId]
+        );
 
       }
 
-    )
+      await axios.post(
 
-    .then(() => {
+        "http://localhost:8080/requests/send",
 
-      alert("Request Sent");
+        formData,
+
+        {
+          headers: {
+            "Content-Type":
+              "multipart/form-data",
+          },
+        }
+
+      );
+
+      alert(
+        "Request Sent Successfully"
+      );
 
       window.location.reload();
 
-    });
+    } catch (error) {
+
+      console.log(error);
+
+      alert(
+        "Failed to send request"
+      );
+
+    }
 
   };
 
-  const getStatus = (teamId) => {
+  const getRequestStatus = (
+    teamId
+  ) => {
 
-    const req = requests.find(
+    return requests.find(
 
-      (r) => r.teamId === teamId
+      (req) =>
+        req.teamId === teamId
+
     );
 
-    return req ? req.status : null;
   };
 
   return (
 
-    <div className="container">
+    <div className="suggested-page">
 
-      <h1>Suggested Teams</h1>
+      <div className="suggested-header">
 
-      <div className="card-container">
+        <h1>
+          Suggested Teams
+        </h1>
 
-        {teams.map((team) => (
+      </div>
 
-          <div
-            className="card"
-            key={team.id}
-          >
+      <div className="teams-grid">
 
-            <h2>{team.teamName}</h2>
+        {teams.map((team) => {
 
-            <p>{team.description}</p>
+          const existingRequest =
+            getRequestStatus(
+              team.id
+            );
 
-            <p>
-              <strong>
-                Required Skills:
-              </strong>
+          return (
 
-              {team.requiredSkills}
-            </p>
+            <div
+              className="team-card"
+              key={team.id}
+            >
 
-            {getStatus(team.id) ? (
+              <h2>
+                {team.teamName}
+              </h2>
 
               <p>
-                <strong>Status:</strong>
 
-                {getStatus(team.id)}
+                <strong>
+                  Required Skills:
+                </strong>
+
+                {" "}
+                {team.requiredSkills}
+
               </p>
 
-            ) : (
+              {!existingRequest ? (
 
-              <button
-                onClick={() =>
-                  sendRequest(team.id)
-                }
-              >
-                Request to Join
-              </button>
+                <>
 
-            )}
+                  <textarea
+                    placeholder="Why do you want to join?"
+                    onChange={(e) =>
+                      setMessages({
 
-          </div>
+                        ...messages,
 
-        ))}
+                        [team.id]:
+                          e.target.value,
+
+                      })
+                    }
+                  />
+
+                  <input
+                    type="file"
+                    onChange={(e) =>
+                      setResumes({
+
+                        ...resumes,
+
+                        [team.id]:
+                          e.target.files[0],
+
+                      })
+                    }
+                  />
+
+                  <button
+                    onClick={() =>
+                      sendRequest(
+                        team.id
+                      )
+                    }
+                  >
+                    Send Request
+                  </button>
+
+                </>
+
+              ) : (
+
+                <div
+                  className={`request-status ${existingRequest.status.toLowerCase()}`}
+                >
+
+                  {existingRequest.status}
+
+                </div>
+
+              )}
+
+            </div>
+
+          );
+
+        })}
 
       </div>
 
     </div>
+
   );
+
 }
 
 export default SuggestedTeams;

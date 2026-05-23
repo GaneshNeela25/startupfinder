@@ -1,0 +1,140 @@
+.requests-page {
+  min-height: 100vh;
+  background: #081b4b;
+  padding: 40px;
+  color: white;
+}
+
+.requests-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.requests-header h1 {
+  font-size: 40px;
+  margin-bottom: 10px;
+}
+
+.requests-header p {
+  color: #d1d5db;
+}
+
+.requests-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 25px;
+  justify-content: center;
+}
+
+.request-card {
+  width: 340px;
+  background: white;
+  color: #081b4b;
+  border-radius: 18px;
+  padding: 25px;
+  box-shadow: 0px 8px 25px rgba(0,0,0,0.2);
+  transition: 0.3s;
+}
+
+.request-card:hover {
+  transform: translateY(-5px);
+}
+
+.profile-circle {
+  width: 70px;
+  height: 70px;
+  background: white;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+.request-card h2 {
+  margin-bottom: 20px;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.label {
+  font-weight: bold;
+}
+
+.status {
+  font-weight: bold;
+}
+
+.approved {
+  color: green;
+}
+
+.rejected {
+  color: red;
+}
+
+.pending {
+  color: orange;
+}
+
+.message-box {
+  margin-top: 20px;
+  background: #f3f4f6;
+  padding: 15px;
+  border-radius: 10px;
+}
+
+.message-box p {
+  margin-top: 8px;
+}
+
+.resume-btn {
+  display: block;
+  margin-top: 20px;
+  text-align: center;
+  background: #081b4b;
+  color: white;
+  padding: 12px;
+  border-radius: 10px;
+  text-decoration: none;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.approve-btn,
+.reject-btn {
+  flex: 1;
+  border: none;
+  padding: 12px;
+  border-radius: 10px;
+  color: white;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.approve-btn {
+  background: green;
+}
+
+.reject-btn {
+  background: crimson;
+}
+
+.empty-box {
+  background: white;
+  color: #081b4b;
+  padding: 30px;
+  border-radius: 15px;
+  font-size: 20px;
+}

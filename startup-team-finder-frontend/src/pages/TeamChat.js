@@ -5,83 +5,33 @@ import React, {
 
 import axios from "axios";
 
+import "./TeamChat.css";
+
 function TeamChat() {
 
-  const currentUser =
+  const user =
     JSON.parse(localStorage.getItem("user"));
 
-  const [approvedTeams, setApprovedTeams] =
-    useState([]);
-
-  const [selectedTeam, setSelectedTeam] =
-    useState(null);
-
-  const [message, setMessage] =
-    useState("");
+  const selectedTeam =
+  JSON.parse(localStorage.getItem("selectedTeam")) || {};
 
   const [messages, setMessages] =
     useState([]);
 
+  const [text, setText] =
+    useState("");
+
   useEffect(() => {
 
-    axios.get(
-      "http://localhost:8080/teams"
-    )
-
-    .then((teamResponse) => {
-
-      axios.get(
-
-        `http://localhost:8080/requests/user/${currentUser.id}`
-
-      )
-
-      .then((requestResponse) => {
-
-        const approvedRequests =
-          requestResponse.data.filter(
-
-            (req) =>
-              req.status === "APPROVED"
-          );
-
-        const availableTeams =
-          teamResponse.data.filter(
-
-            (team) => {
-
-              if (
-                team.ownerId === currentUser.id
-              ) {
-                return true;
-              }
-
-              return approvedRequests.some(
-
-                (req) =>
-                  req.teamId === team.id
-              );
-
-            }
-          );
-
-        setApprovedTeams(
-          availableTeams
-        );
-
-      });
-
-    });
+    fetchMessages();
 
   }, []);
 
-  const openChat = (team) => {
-
-    setSelectedTeam(team);
+  const fetchMessages = () => {
 
     axios.get(
 
-      `http://localhost:8080/chat/${team.id}`
+      `http://localhost:8080/chat/${selectedTeam.id}`
 
     )
 
@@ -89,136 +39,104 @@ function TeamChat() {
 
       setMessages(response.data);
 
+    })
+
+    .catch((error) => {
+
+      console.log(error);
+
     });
 
   };
 
   const sendMessage = () => {
 
-    if (!message.trim()) return;
-
-    const newMessage = {
-
-      teamId: selectedTeam.id,
-
-      sender: currentUser.name,
-
-      message: message
-
-    };
+    if (!text.trim()) return;
 
     axios.post(
 
       "http://localhost:8080/chat",
 
-      newMessage
+      {
+        sender: user.name,
+        message: text,
+        teamId: selectedTeam.id
+      }
 
     )
 
     .then(() => {
 
-      axios.get(
+      setText("");
 
-        `http://localhost:8080/chat/${selectedTeam.id}`
-
-      )
-
-      .then((response) => {
-
-        setMessages(response.data);
-
-      });
+      fetchMessages();
 
     });
 
-    setMessage("");
   };
 
   return (
 
-    <div className="container">
+    <div className="chat-page">
 
-      <h1>Team Chat</h1>
+      <div className="chat-container">
 
-      <div className="card-container">
+        <div className="chat-header">
 
-        {approvedTeams.map((team) => (
-
-          <div
-            className="card"
-            key={team.id}
-          >
-
-            <h2>{team.teamName}</h2>
-
-            <button
-              onClick={() =>
-                openChat(team)
-              }
-            >
-              Open Chat
-            </button>
-
-          </div>
-
-        ))}
-
-      </div>
-
-      {selectedTeam && (
-
-        <div className="chat-container">
-
-          <h2>
-            {selectedTeam.teamName}
-          </h2>
-
-          <div className="messages">
-
-            {messages.map((msg) => (
-
-              <div
-                key={msg.id}
-                className="message"
-              >
-
-                <strong>
-                  {msg.sender}:
-                </strong>
-
-                {msg.message}
-
-              </div>
-
-            ))}
-
-          </div>
-
-          <div className="chat-input">
-
-            <input
-              type="text"
-              placeholder="Type message"
-              value={message}
-              onChange={(e) =>
-                setMessage(e.target.value)
-              }
-            />
-
-            <button
-              onClick={sendMessage}
-            >
-              Send
-            </button>
-
-          </div>
+          {selectedTeam?.teamName || "Team Chat"}
 
         </div>
 
-      )}
+        <div className="chat-messages">
+
+          {messages.map((msg) => (
+
+            <div
+              key={msg.id}
+              className={
+                msg.sender === user.name
+                ? "my-message"
+                : "other-message"
+              }
+            >
+
+              <strong>
+                {msg.sender}
+              </strong>
+
+              <p>{msg.message}</p>
+
+            </div>
+
+          ))}
+
+        </div>
+
+        <div className="chat-input">
+
+          <input
+            type="text"
+            placeholder="Type message..."
+            value={text}
+            onChange={(e) =>
+              setText(e.target.value)
+            }
+          />
+
+          <button
+            onClick={sendMessage}
+          >
+            Send
+          </button>
+
+        </div>
+
+      </div>
 
     </div>
+
   );
+
 }
 
 export default TeamChat;

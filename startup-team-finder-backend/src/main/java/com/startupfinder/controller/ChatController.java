@@ -4,6 +4,7 @@ import com.startupfinder.model.ChatMessage;
 import com.startupfinder.repository.ChatMessageRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,28 +16,26 @@ import java.util.List;
 public class ChatController {
 
     @Autowired
-    private ChatMessageRepository chatRepo;
-
-    @PostMapping
-    public ChatMessage sendMessage(
-
-        @RequestBody ChatMessage chatMessage
-
-    ) {
-
-        return chatRepo.save(chatMessage);
-
-    }
+    private ChatMessageRepository chatMessageRepository;
 
     @GetMapping("/{teamId}")
 
     public List<ChatMessage> getMessages(
-
-        @PathVariable Long teamId
-
+            @PathVariable Long teamId
     ) {
 
-        return chatRepo.findByTeamId(teamId);
+        return chatMessageRepository.findByTeamId(teamId);
 
     }
+
+    @PostMapping
+
+    public ChatMessage sendMessage(
+            @RequestBody ChatMessage message
+    ) {
+
+        return chatMessageRepository.save(message);
+
+    }
+
 }
