@@ -30,26 +30,29 @@ function Home() {
 
             <div className="hero-card">
               <h3>Teams</h3>
-              <p>
+
+              <h5>
                 Create and manage
                 startup teams
-              </p>
+              </h5>
             </div>
 
             <div className="hero-card">
               <h3>Networking</h3>
-              <p>
+
+              <h5>
                 Connect with skilled
                 professionals
-              </p>
+              </h5>
             </div>
 
             <div className="hero-card">
               <h3>Collaboration</h3>
-              <p>
+               
+              <h5>
                 Chat and work together
                 in real-time
-              </p>
+              </h5>
             </div>
 
           </div>

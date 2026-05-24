@@ -1,44 +1,275 @@
-import React from "react";
+import React, {
+  useEffect,
+  useState
+} from "react";
+
+import axios from "axios";
+
 import "./Profile.css";
 
 function Profile() {
 
   const user =
-    JSON.parse(localStorage.getItem("user"));
+    JSON.parse(
+      localStorage.getItem("user")
+    );
+
+  const [teams, setTeams] =
+    useState([]);
+
+  useEffect(() => {
+
+    loadTeams();
+
+  }, []);
+
+  const loadTeams = async () => {
+
+    try {
+
+      const teamResponse =
+        await axios.get(
+          "http://localhost:8080/teams"
+        );
+
+      const allTeams =
+        teamResponse.data;
+
+      // FOUNDER
+      if (
+        user.role
+          .toLowerCase()
+          .includes("founder")
+      ) {
+
+        const founderTeams =
+
+          allTeams.filter(
+
+            (team) =>
+
+              Number(team.ownerId) ===
+              Number(user.id)
+
+          );
+
+        setTeams(founderTeams);
+
+      }
+
+      // NON FOUNDER
+      else {
+
+        const requestResponse =
+          await axios.get(
+
+            `http://localhost:8080/requests/user/${user.id}`
+
+          );
+
+        // ONLY APPROVED
+        const approvedRequests =
+
+          requestResponse.data.filter(
+
+            (req) =>
+
+              req.status ===
+              "APPROVED"
+
+          );
+
+        // TEAM IDS
+        const approvedTeamIds =
+
+          approvedRequests.map(
+
+            (req) =>
+              Number(req.teamId)
+
+          );
+
+        // FILTER TEAMS
+        const approvedTeams =
+
+          allTeams.filter(
+
+            (team) =>
+
+              approvedTeamIds.includes(
+                Number(team.id)
+              )
+
+          );
+
+        setTeams(approvedTeams);
+
+      }
+
+    } catch (error) {
+
+      console.log(error);
+
+    }
+
+  };
 
   return (
 
     <div className="profile-page">
 
-      <div className="profile-card">
+      <div className="profile-container">
 
-        <div className="profile-avatar">
+        {/* LEFT SIDE */}
 
-          {user.name.charAt(0)}
+        <div className="profile-left">
+
+          <div className="profile-avatar">
+
+            {user.name?.charAt(0)}
+
+          </div>
+
+          <h1 className="profile-name">
+            {user.name}
+          </h1>
+
+          <p className="profile-email">
+            {user.email}
+          </p>
+
+          <div className="profile-info">
+
+            <p>
+
+              <span>Role:</span>
+
+              <br />
+
+              {user.role}
+
+            </p>
+
+            <p>
+
+              <span>Skills:</span>
+
+              <br />
+
+              {user.skills}
+
+            </p>
+
+          </div>
 
         </div>
 
-        <h1>{user.name}</h1>
+        {/* RIGHT SIDE */}
 
-        <p>{user.email}</p>
+        <div className="profile-right">
 
-        <div className="profile-details">
+          <h2 className="section-title">
 
-          <div className="detail-box">
+            {
 
-            <h3>Role</h3>
+              user.role
+                .toLowerCase()
+                .includes("founder")
 
-            <p>{user.role}</p>
+                ?
 
-          </div>
+                "Created Teams"
 
-          <div className="detail-box">
+                :
 
-            <h3>Skills</h3>
+                "Approved Teams"
 
-            <p>{user.skills}</p>
+            }
 
-          </div>
+          </h2>
+
+          {
+
+            teams.length === 0
+
+            ?
+
+            <div className="no-teams">
+
+              No Teams Available
+
+            </div>
+
+            :
+
+            <div className="teams-grid">
+
+              {
+
+                teams.map((team) => (
+
+                  <div
+                    className="team-card"
+                    key={team.id}
+                  >
+
+                    <div className="team-icon">
+
+                      {team.teamName?.charAt(0)}
+
+                    </div>
+
+                    <div className="team-details">
+
+                      <p>
+
+                        <strong>
+                          Team Name:
+                        </strong>
+
+                        <br />
+
+                        {team.teamName}
+
+                      </p>
+
+                      <p>
+
+                        <strong>
+                          Project Idea:
+                        </strong>
+
+                        <br />
+
+                        {team.projectIdea}
+
+                      </p>
+
+                      <p>
+
+                        <strong>
+                          Required Skills:
+                        </strong>
+
+                      </p>
+
+                      <div className="skill-badge">
+
+                        {team.requiredSkills}
+
+                      </div>
+
+                    </div>
+
+                  </div>
+
+                ))
+
+              }
+
+            </div>
+
+          }
 
         </div>
 
