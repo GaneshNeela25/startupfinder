@@ -22,5 +22,15 @@ implements WebMvcConfigurer {
         .addResourceLocations(
             "file:uploads/"
         );
+
+        registry.addResourceHandler(
+            "/chat_uploads/**"
+        )
+
+        .addResourceLocations(
+            "file:chat_uploads/"
+        );
+
     }
+
 }

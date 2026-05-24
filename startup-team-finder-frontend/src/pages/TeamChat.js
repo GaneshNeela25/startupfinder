@@ -10,10 +10,14 @@ import "./TeamChat.css";
 function TeamChat() {
 
   const user =
-    JSON.parse(localStorage.getItem("user"));
+    JSON.parse(
+      localStorage.getItem("user")
+    );
 
   const selectedTeam =
-  JSON.parse(localStorage.getItem("selectedTeam")) || {};
+    JSON.parse(
+      localStorage.getItem("selectedTeam")
+    ) || {};
 
   const [messages, setMessages] =
     useState([]);
@@ -21,11 +25,16 @@ function TeamChat() {
   const [text, setText] =
     useState("");
 
+  const [selectedFile, setSelectedFile] =
+    useState(null);
+
   useEffect(() => {
 
     fetchMessages();
 
   }, []);
+
+  // FETCH CHAT
 
   const fetchMessages = () => {
 
@@ -48,6 +57,8 @@ function TeamChat() {
     });
 
   };
+
+  // SEND TEXT MESSAGE
 
   const sendMessage = () => {
 
@@ -75,11 +86,61 @@ function TeamChat() {
 
   };
 
+  // UPLOAD FILE
+
+  const uploadFile = async () => {
+
+    if (!selectedFile) return;
+
+    const formData =
+      new FormData();
+
+    formData.append(
+      "teamId",
+      selectedTeam.id
+    );
+
+    formData.append(
+      "sender",
+      user.name
+    );
+
+    formData.append(
+      "file",
+      selectedFile
+    );
+
+    try {
+
+      await axios.post(
+
+        "http://localhost:8080/chat/upload",
+
+        formData
+
+      );
+
+      setSelectedFile(null);
+
+      fetchMessages();
+
+    }
+
+    catch (error) {
+
+      console.log(error);
+
+    }
+
+  };
+
   return (
 
     <div className="chat-page">
 
       <div className="chat-container">
+
+        {/* HEADER */}
 
         <div className="chat-header">
 
@@ -87,30 +148,93 @@ function TeamChat() {
 
         </div>
 
+        {/* MESSAGES */}
+
         <div className="chat-messages">
 
-          {messages.map((msg) => (
+          {
 
-            <div
-              key={msg.id}
-              className={
-                msg.sender === user.name
-                ? "my-message"
-                : "other-message"
-              }
-            >
+            messages.map((msg) => (
 
-              <strong>
-                {msg.sender}
-              </strong>
+              <div
+                key={msg.id}
+                className={
 
-              <p>{msg.message}</p>
+                  msg.sender === user.name
 
-            </div>
+                  ?
 
-          ))}
+                  "my-message"
+
+                  :
+
+                  "other-message"
+
+                }
+              >
+
+                <strong>
+
+                  {msg.sender}
+
+                </strong>
+
+                {/* TEXT MESSAGE */}
+
+                {
+
+                  msg.message !==
+                  "FILE_SHARED"
+
+                  &&
+
+                  <p>
+
+                    {msg.message}
+
+                  </p>
+
+                }
+
+                {/* FILE MESSAGE */}
+
+                {
+
+                  msg.fileName && (
+
+                    <a
+
+                      href={
+
+                        `http://localhost:8080/chat_uploads/${msg.fileName}`
+
+                      }
+
+                      target="_blank"
+
+                      rel="noreferrer"
+
+                      className="file-link"
+
+                    >
+
+                      📄 {msg.originalFileName}
+
+                    </a>
+
+                  )
+
+                }
+
+              </div>
+
+            ))
+
+          }
 
         </div>
+
+        {/* INPUT AREA */}
 
         <div className="chat-input">
 
@@ -122,6 +246,21 @@ function TeamChat() {
               setText(e.target.value)
             }
           />
+
+          <input
+            type="file"
+            onChange={(e) =>
+              setSelectedFile(
+                e.target.files[0]
+              )
+            }
+          />
+
+          <button
+            onClick={uploadFile}
+          >
+            Upload
+          </button>
 
           <button
             onClick={sendMessage}

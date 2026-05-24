@@ -15,6 +15,10 @@ public class ChatMessage {
 
     private Long teamId;
 
+    private String fileName;
+
+    private String originalFileName;
+
     public ChatMessage() {
     }
 
@@ -44,5 +48,21 @@ public class ChatMessage {
 
     public void setTeamId(Long teamId) {
         this.teamId = teamId;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
+
+    public String getOriginalFileName() {
+        return originalFileName;
+    }
+
+    public void setOriginalFileName(String originalFileName) {
+        this.originalFileName = originalFileName;
     }
 }
