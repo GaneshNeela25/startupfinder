@@ -34,7 +34,7 @@ function TeamChat() {
 
   }, []);
 
-  // FETCH CHAT
+  // FETCH CHAT MESSAGES
 
   const fetchMessages = () => {
 
@@ -58,7 +58,7 @@ function TeamChat() {
 
   };
 
-  // SEND TEXT MESSAGE
+  // SEND MESSAGE
 
   const sendMessage = () => {
 
@@ -81,6 +81,12 @@ function TeamChat() {
       setText("");
 
       fetchMessages();
+
+    })
+
+    .catch((error) => {
+
+      console.log(error);
 
     });
 
@@ -144,7 +150,15 @@ function TeamChat() {
 
         <div className="chat-header">
 
-          {selectedTeam?.teamName || "Team Chat"}
+          {
+
+            selectedTeam?.teamName
+
+            ||
+
+            "Team Chat"
+
+          }
 
         </div>
 
@@ -179,8 +193,6 @@ function TeamChat() {
 
                 </strong>
 
-                {/* TEXT MESSAGE */}
-
                 {
 
                   msg.message !==
@@ -195,8 +207,6 @@ function TeamChat() {
                   </p>
 
                 }
-
-                {/* FILE MESSAGE */}
 
                 {
 

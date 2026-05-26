@@ -96,6 +96,11 @@ function SuggestedTeams() {
         currentUser.name
       );
 
+      formData.append(
+        "skills",
+        currentUser.skills
+      );
+
       if (resumes[teamId]) {
 
         formData.append(

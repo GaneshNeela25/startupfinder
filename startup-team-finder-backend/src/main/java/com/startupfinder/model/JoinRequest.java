@@ -17,6 +17,8 @@ public class JoinRequest {
 
     private String role;
 
+    private String skills;
+
     private String message;
 
     private String status;
@@ -88,4 +90,12 @@ public class JoinRequest {
         this.resumeFileName =
             resumeFileName;
     }
+
+    public String getSkills() {
+    return skills;
+}
+
+public void setSkills(String skills) {
+    this.skills = skills;
+}
 }

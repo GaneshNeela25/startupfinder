@@ -52,6 +52,9 @@ public class JoinRequestController {
             @RequestParam("userName")
             String userName,
 
+            @RequestParam("skills")
+                String skills,
+
             @RequestParam(
                     value = "resume",
                     required = false
@@ -73,6 +76,8 @@ public class JoinRequestController {
         request.setTeamId(teamId);
 
         request.setUserName(userName);
+
+        request.setSkills(skills);
 
         request.setStatus("PENDING");
 
@@ -203,6 +208,34 @@ public List<JoinRequest> getUserRequests(
                             .equalsIgnoreCase(
                                     "APPROVED"
                             )
+
+            )
+
+            .toList();
+
+}
+
+@GetMapping("/team/{teamId}")
+
+public List<JoinRequest>
+getTeamMembers(
+
+        @PathVariable
+        Long teamId
+
+) {
+
+    List<JoinRequest> requests =
+
+            joinRequestRepository
+                    .findByTeamId(teamId);
+
+    return requests.stream()
+
+            .filter(req ->
+
+                    req.getStatus()
+                            .equals("APPROVED")
 
             )
 

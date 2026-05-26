@@ -5,7 +5,9 @@ import React, {
 
 import axios from "axios";
 
-import { useNavigate } from "react-router-dom";
+import {
+  useNavigate
+} from "react-router-dom";
 
 import "./Team.css";
 
@@ -14,35 +16,46 @@ function Teams() {
   const navigate =
     useNavigate();
 
-  const currentUser =
-    JSON.parse(localStorage.getItem("user"));
+  const user =
+    JSON.parse(
+      localStorage.getItem("user")
+    );
 
   const [teams, setTeams] =
     useState([]);
 
+  const [teamMembers, setTeamMembers] =
+    useState({});
+
   useEffect(() => {
 
-  const loadTeams = async () => {
+    fetchTeams();
+
+  }, []);
+
+  // FETCH TEAMS
+
+  const fetchTeams = async () => {
 
     try {
 
-      // ALL TEAMS
+      // GET ALL TEAMS
+
       const teamResponse =
         await axios.get(
+
           "http://localhost:8080/teams"
+
         );
 
       const allTeams =
         teamResponse.data;
 
-      // USER ROLE
-      const role =
-        currentUser.role
-          .toLowerCase()
-          .trim();
+      // FOUNDER LOGIN
 
-      // ===== FOUNDER =====
-      if (role.includes("founder")) {
+      if (
+        user.role === "FOUNDER"
+      ) {
 
         const founderTeams =
 
@@ -51,25 +64,29 @@ function Teams() {
             (team) =>
 
               Number(team.ownerId) ===
-              Number(currentUser.id)
+              Number(user.id)
 
           );
 
         setTeams(founderTeams);
 
+        fetchMembers(founderTeams);
+
       }
 
-      // ===== NON FOUNDER =====
+      // NORMAL USERS
+
       else {
 
         const requestResponse =
           await axios.get(
 
-            `http://localhost:8080/requests/user/${currentUser.id}`
+            `http://localhost:8080/requests/user/${user.id}`
 
           );
 
         // ONLY APPROVED
+
         const approvedRequests =
 
           requestResponse.data.filter(
@@ -82,6 +99,7 @@ function Teams() {
           );
 
         // TEAM IDS
+
         const approvedTeamIds =
 
           approvedRequests.map(
@@ -91,7 +109,8 @@ function Teams() {
 
           );
 
-        // FILTER TEAMS
+        // SHOW ONLY APPROVED TEAMS
+
         const joinedTeams =
 
           allTeams.filter(
@@ -99,16 +118,22 @@ function Teams() {
             (team) =>
 
               approvedTeamIds.includes(
+
                 Number(team.id)
+
               )
 
           );
 
         setTeams(joinedTeams);
 
+        fetchMembers(joinedTeams);
+
       }
 
-    } catch (error) {
+    }
+
+    catch (error) {
 
       console.log(error);
 
@@ -116,115 +141,216 @@ function Teams() {
 
   };
 
-  loadTeams();
+  // FETCH MEMBERS
 
-}, []);
+  const fetchMembers = async (teamsData) => {
+
+    let membersData = {};
+
+    for (let team of teamsData) {
+
+      try {
+
+        const response =
+          await axios.get(
+
+            `http://localhost:8080/requests/team/${team.id}`
+
+          );
+
+        membersData[team.id] =
+          response.data;
+
+      }
+
+      catch (error) {
+
+        console.log(error);
+
+      }
+
+    }
+
+    setTeamMembers(membersData);
+
+  };
+
+  // OPEN CHAT
 
   const openChat = (team) => {
 
-  const isApproved = teams.some(
-    (t) => t.id === team.id
-  );
+    localStorage.setItem(
 
-  if (!isApproved) {
+      "selectedTeam",
 
-    alert(
-      "You are not approved for this team"
+      JSON.stringify(team)
+
     );
 
-    return;
-  }
+    navigate("/team-chat");
 
-  localStorage.setItem(
-    "selectedTeam",
-    JSON.stringify(team)
-  );
+  };
 
-  navigate("/team-chat");
+  // VIEW MEMBERS
 
-};
+  const viewMembers = (team) => {
+
+    const members =
+      teamMembers[team.id] || [];
+
+    let founderDetails =
+
+      `Founder Name: ${team.ownerName || "Founder"}\n\n` +
+
+      `Role: Founder\n\n` +
+
+      `Skills: ${team.ownerSkills || "Not Added"}\n\n`;
+
+    let memberDetails =
+
+      members.length > 0
+
+      ?
+
+      members.map((member, index) =>
+
+        `${index + 1}. ${member.userName}
+
+Role: ${member.role}
+
+Skills: ${member.skills || "Not Added"}`
+
+      ).join("\n\n")
+
+      :
+
+      "No accepted members yet";
+
+    alert(
+
+      founderDetails +
+
+      "Accepted Members:\n\n" +
+
+      memberDetails
+
+    );
+
+  };
 
   return (
 
-    <div className="team-page">
+    <div className="teams-page">
 
-      {
-  currentUser.role
-    .toLowerCase()
-    .includes("founder")
+      <div className="teams-container">
 
-  &&
+        <h1 className="teams-heading">
 
-  <div className="create-team-box">
+          Your Teams
 
-    <button
-      className="create-team-btn"
-      onClick={() =>
-        navigate("/create-team")
-      }
-    >
-      + Create New Team
-    </button>
+        </h1>
 
-  </div>
-}
+        {
 
-      <h1>Your Teams</h1>
+          user.role === "FOUNDER"
 
-      <div className="team-grid">
+          &&
 
-        {teams.length === 0 ? (
+          <button
+            className="create-team-btn"
+            onClick={() =>
+              navigate("/create-team")
+            }
+          >
 
-          <div className="empty-box">
+            + Create Team
 
-            No Teams Available
+          </button>
 
-          </div>
+        }
 
-        ) : (
+        <div className="teams-grid">
 
-          teams.map((team) => (
+          {
 
-            <div
-              className="team-card"
-              key={team.id}
-            >
+            teams.length > 0
 
-              <div className="team-icon">
+            ?
 
-                {team.teamName
-                  ?.charAt(0)}
+            teams.map((team) => (
 
-              </div>
-
-              <h2>
-                {team.teamName}
-              </h2>
-
-              <p>
-                {team.description}
-              </p>
-
-              <div className="skills-box">
-
-                {team.requiredSkills}
-
-              </div>
-
-              <button
-                className="chat-btn"
-                onClick={() =>
-                  openChat(team)
-                }
+              <div
+                key={team.id}
+                className="team-card"
               >
-                Open Chat
-              </button>
 
-            </div>
+                <div className="team-avatar">
 
-          ))
+                  {
 
-        )}
+                    team.teamName
+                    ?.charAt(0)
+                    ?.toUpperCase()
+
+                  }
+
+                </div>
+
+                <h2>
+
+                  {team.teamName}
+
+                </h2>
+
+                <p>
+
+                  {team.projectIdea}
+
+                </p>
+
+                <div className="team-skill">
+
+                  {team.requiredSkills}
+
+                </div>
+
+                <button
+                  className="chat-btn"
+                  onClick={() =>
+                    openChat(team)
+                  }
+                >
+
+                  Open Chat
+
+                </button>
+
+                <button
+                  className="members-btn"
+                  onClick={() =>
+                    viewMembers(team)
+                  }
+                >
+
+                  Team Members
+
+                </button>
+
+              </div>
+
+            ))
+
+            :
+
+            <h2 style={{ color: "white" }}>
+
+              No Teams Available
+
+            </h2>
+
+          }
+
+        </div>
 
       </div>
 

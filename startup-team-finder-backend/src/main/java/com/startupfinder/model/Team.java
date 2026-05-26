@@ -17,6 +17,8 @@ public class Team {
 
     private Long ownerId;
 
+    private String ownerSkills;
+
     public Team() {
     }
 
@@ -54,5 +56,13 @@ public class Team {
 
     public void setOwnerId(Long ownerId) {
         this.ownerId = ownerId;
+    }
+
+    public String getOwnerSkills() {
+        return ownerSkills;
+    }
+
+    public void setOwnerSkills(String ownerSkills) {
+        this.ownerSkills = ownerSkills;
     }
 }
