@@ -1,10 +1,16 @@
 import React from "react";
+
 import "./Home.css";
 
 function Home() {
 
   const user =
-    JSON.parse(localStorage.getItem("user"));
+
+    JSON.parse(
+
+      localStorage.getItem("user")
+
+    ) || {};
 
   return (
 
@@ -15,44 +21,73 @@ function Home() {
         <div className="hero-left">
 
           <h1>
+
             Welcome to
+
             <span> BuildNest</span>
+
           </h1>
 
           <p>
+
             Connect with founders,
             developers, designers,
             and investors to build
             amazing startups together.
+
           </p>
 
           <div className="hero-cards">
 
             <div className="hero-card">
-              <h3>Teams</h3>
+
+              <h3>
+
+                Teams
+
+              </h3>
 
               <h5>
+
                 Create and manage
                 startup teams
+
               </h5>
+
             </div>
 
             <div className="hero-card">
-              <h3>Networking</h3>
+
+              <h3>
+
+                Networking
+
+              </h3>
 
               <h5>
+
                 Connect with skilled
                 professionals
+
               </h5>
+
             </div>
 
             <div className="hero-card">
-              <h3>Collaboration</h3>
-               
+
+              <h3>
+
+                Collaboration
+
+              </h3>
+
               <h5>
+
                 Chat and work together
                 in real-time
+
               </h5>
+
             </div>
 
           </div>
@@ -64,12 +99,50 @@ function Home() {
           <div className="profile-box">
 
             <div className="avatar">
-              {user.name.charAt(0)}
+
+              {
+
+                user?.name
+
+                ?
+
+                user.name.charAt(0)
+
+                :
+
+                "U"
+
+              }
+
             </div>
 
-            <h2>{user.name}</h2>
+            <h2>
 
-            <p>{user.role}</p>
+              {
+
+                user?.name
+
+                ||
+
+                "User"
+
+              }
+
+            </h2>
+
+            <p>
+
+              {
+
+                user?.role
+
+                ||
+
+                "Member"
+
+              }
+
+            </p>
 
           </div>
 

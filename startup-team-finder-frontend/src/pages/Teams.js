@@ -27,6 +27,9 @@ function Teams() {
   const [teamMembers, setTeamMembers] =
     useState({});
 
+  const [selectedMembers, setSelectedMembers] =
+    useState(null);
+
   useEffect(() => {
 
     fetchTeams();
@@ -74,7 +77,7 @@ function Teams() {
 
       }
 
-      // NORMAL USERS
+      // NORMAL USER
 
       else {
 
@@ -98,7 +101,7 @@ function Teams() {
 
           );
 
-        // TEAM IDS
+        // APPROVED TEAM IDS
 
         const approvedTeamIds =
 
@@ -198,43 +201,13 @@ function Teams() {
     const members =
       teamMembers[team.id] || [];
 
-    let founderDetails =
+    setSelectedMembers({
 
-      `Founder Name: ${team.ownerName || "Founder"}\n\n` +
+      team,
 
-      `Role: Founder\n\n` +
+      members
 
-      `Skills: ${team.ownerSkills || "Not Added"}\n\n`;
-
-    let memberDetails =
-
-      members.length > 0
-
-      ?
-
-      members.map((member, index) =>
-
-        `${index + 1}. ${member.userName}
-
-Role: ${member.role}
-
-Skills: ${member.skills || "Not Added"}`
-
-      ).join("\n\n")
-
-      :
-
-      "No accepted members yet";
-
-    alert(
-
-      founderDetails +
-
-      "Accepted Members:\n\n" +
-
-      memberDetails
-
-    );
+    });
 
   };
 
@@ -353,6 +326,162 @@ Skills: ${member.skills || "Not Added"}`
         </div>
 
       </div>
+
+      {/* MEMBERS MODAL */}
+
+      {
+
+        selectedMembers && (
+
+          <div className="members-modal">
+
+            <div className="members-modal-content">
+
+              <button
+                className="close-btn"
+                onClick={() =>
+                  setSelectedMembers(null)
+                }
+              >
+
+                ×
+
+              </button>
+
+              <h2>
+
+                Team Members
+
+              </h2>
+
+              {/* FOUNDER */}
+
+              <div className="member-item">
+
+                <h3>
+
+                  Founder
+
+                </h3>
+
+                <p>
+
+                  <strong>Name:</strong>
+
+                  {" "}
+
+                  {
+
+                    selectedMembers.team.ownerName
+
+                    ||
+
+                    "Founder"
+
+                  }
+
+                </p>
+
+                <p>
+
+                  <strong>Role:</strong>
+
+                  Founder
+
+                </p>
+
+                <p>
+
+                  <strong>Skills:</strong>
+
+                  {
+
+                    selectedMembers.team.ownerSkills
+
+                    ||
+
+                    "Not Added"
+
+                  }
+
+                </p>
+
+              </div>
+
+              {/* ACCEPTED MEMBERS */}
+
+              {
+
+                selectedMembers.members.length > 0
+
+                ?
+
+                selectedMembers.members.map(
+
+                  (member) => (
+
+                    <div
+                      key={member.id}
+                      className="member-item"
+                    >
+
+                      <h3>
+
+                        {member.userName}
+
+                      </h3>
+
+                      <p>
+
+                        <strong>Role:</strong>
+
+                        {" "}
+
+                        {member.role}
+
+                      </p>
+
+                      <p>
+
+                        <strong>Skills:</strong>
+
+                        {" "}
+
+                        {
+
+                          member.skills
+
+                          ||
+
+                          "Not Added"
+
+                        }
+
+                      </p>
+
+                    </div>
+
+                  )
+
+                )
+
+                :
+
+                <p>
+
+                  No accepted members yet
+
+                </p>
+
+              }
+
+            </div>
+
+          </div>
+
+        )
+
+      }
 
     </div>
 
